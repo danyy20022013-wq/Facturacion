@@ -1,0 +1,8 @@
+C:\Users\danyy\OneDrive\Escritorio\Facturacion\blazor\obj\Debug\net9.0\factura.csproj.AssemblyReference.cache
+C:\Users\danyy\OneDrive\Escritorio\Facturacion\blazor\obj\Debug\net9.0\rpswa.dswa.cache.json
+C:\Users\danyy\OneDrive\Escritorio\Facturacion\blazor\obj\Debug\net9.0\factura.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\danyy\OneDrive\Escritorio\Facturacion\blazor\obj\Debug\net9.0\factura.AssemblyInfoInputs.cache
+C:\Users\danyy\OneDrive\Escritorio\Facturacion\blazor\obj\Debug\net9.0\factura.AssemblyInfo.cs
+C:\Users\danyy\OneDrive\Escritorio\Facturacion\blazor\obj\Debug\net9.0\factura.csproj.CoreCompileInputs.cache
+C:\Users\danyy\OneDrive\Escritorio\Facturacion\blazor\obj\Debug\net9.0\factura.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\danyy\OneDrive\Escritorio\Facturacion\blazor\obj\Debug\net9.0\factura.sourcelink.json

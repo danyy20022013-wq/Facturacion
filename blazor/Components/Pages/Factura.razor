@@ -1,0 +1,262 @@
+﻿@page "/Facturas"
+@using factura.Components.Data
+@using FacturaModel = factura.Components.Data.Factura
+@using ArticuloModel = factura.Components.Data.Articulo
+@inject ServicioFacturas ServicioFacturas
+@rendermode InteractiveServer
+
+<h2>@TituloFormulario</h2>
+
+<div>
+    <input type="hidden" @bind="nuevaFactura.Id" />
+
+    <label>Fecha:</label>
+    <input type="date" @bind="nuevaFactura.Fecha" />
+
+    <label>Cliente:</label>
+    <input @bind="nuevaFactura.Cliente" placeholder="Nombre del cliente" />
+
+    <h4>Artículos</h4>
+
+    <table border="1" cellpadding="4">
+        <thead>
+            <tr>
+                <th>Artículo</th>
+                <th>Cantidad</th>
+                <th>Precio</th>
+                <th>Subtotal</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var a in articulosTemp)
+            {
+                <tr>
+                    <td>@a.Nombre</td>
+                    <td>@a.Cantidad</td>
+                    <td>@a.Precio</td>
+                    <td>@a.Subtotal</td>
+                    <td>
+                        <button @onclick="() => CargarArticuloParaEditar(a)">Editar</button>
+                        <button @onclick="() => EliminarArticuloTemp(a)">Eliminar</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div>
+        <input type="hidden" @bind="nuevoArticulo.Id" />
+
+        <input placeholder="Artículo" @bind="nuevoArticulo.Nombre" />
+        <input type="number" min="1" placeholder="Cantidad" @bind="nuevoArticulo.Cantidad" />
+        <input type="number" step="0.01" placeholder="Precio" @bind="nuevoArticulo.Precio" />
+
+        <button @onclick="AgregarOActualizarArticuloTemp">
+            @BotonArticuloTexto
+        </button>
+    </div>
+
+    <button @onclick="GuardarCambiosFactura">@BotonFacturaTexto</button>
+
+    @if (nuevaFactura.Id > 0)
+    {
+        <button @onclick="CancelarEdicion">Cancelar</button>
+    }
+</div>
+
+<hr />
+
+<h3>Facturas Registradas</h3>
+
+@if (facturas.Count == 0)
+{
+    <p>No hay facturas registradas.</p>
+}
+else
+{
+    @foreach (var f in facturas)
+    {
+        <div>
+            <p><strong>Cliente:</strong> @f.Cliente</p>
+            <p><strong>Fecha:</strong> @f.Fecha.ToShortDateString()</p>
+            <p><strong>Total:</strong> $@f.Total</p>
+
+            <table border="1" cellpadding="4">
+                <thead>
+                    <tr>
+                        <th>Artículo</th>
+                        <th>Cant.</th>
+                        <th>Precio</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var a in f.Articulos)
+                    {
+                        <tr>
+                            <td>@a.Nombre</td>
+                            <td>@a.Cantidad</td>
+                            <td>@a.Precio</td>
+                            <td>@a.Subtotal</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <button @onclick="() => CargarFacturaParaEditar(f)">Editar</button>
+            <button @onclick="() => EliminarFactura(f)">Eliminar Factura</button>
+            <hr />
+        </div>
+    }
+}
+
+
+@code {
+    private List<FacturaModel> facturas = new();
+    private FacturaModel nuevaFactura = new();
+    private ArticuloModel nuevoArticulo = new();
+    private List<ArticuloModel> articulosTemp = new();
+
+    private List<int> articulosIdsParaEliminar = new();
+
+    private string TituloFormulario => nuevaFactura.Id == 0 ? "Nueva Factura" : $"Editando Factura #{nuevaFactura.Id}";
+    private string BotonFacturaTexto => nuevaFactura.Id == 0 ? "Guardar Factura" : "Actualizar Factura";
+    private string BotonArticuloTexto => nuevoArticulo.Id == 0 ? "Agregar Artículo" : "Actualizar Artículo";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarFacturas();
+    }
+
+    private async Task CargarFacturas()
+    {
+        facturas = await ServicioFacturas.ObtenerFacturas();
+    }
+
+    private void CargarFacturaParaEditar(FacturaModel factura)
+    {
+        nuevaFactura = new FacturaModel
+        {
+            Id = factura.Id,
+            Cliente = factura.Cliente,
+            Fecha = factura.Fecha
+        };
+
+        articulosTemp = factura.Articulos.Select(a => new ArticuloModel
+        {
+            Id = a.Id,
+            FacturaId = a.FacturaId,
+            Nombre = a.Nombre,
+            Cantidad = a.Cantidad,
+            Precio = a.Precio
+        }).ToList();
+
+        articulosIdsParaEliminar.Clear();
+    }
+
+    private void CancelarEdicion()
+    {
+        nuevaFactura = new FacturaModel();
+        nuevoArticulo = new ArticuloModel();
+        articulosTemp.Clear();
+        articulosIdsParaEliminar.Clear();
+    }
+
+    private async Task GuardarCambiosFactura()
+    {
+        if (string.IsNullOrWhiteSpace(nuevaFactura.Cliente) || articulosTemp.Count == 0)
+        {
+            return;
+        }
+
+        if (nuevaFactura.Id == 0)
+        {
+            nuevaFactura.Articulos = articulosTemp;
+            await ServicioFacturas.AgregarFactura(nuevaFactura);
+        }
+        else
+        {
+            await ServicioFacturas.ActualizarFactura(nuevaFactura);
+
+            foreach (var id in articulosIdsParaEliminar)
+            {
+                await ServicioFacturas.EliminarArticulo(id);
+            }
+
+            foreach (var art in articulosTemp)
+            {
+                if (art.Id == 0)
+                {
+                    await ServicioFacturas.AgregarArticulo(nuevaFactura.Id, art);
+                }
+                else
+                {
+                    await ServicioFacturas.ActualizarArticulo(art);
+                }
+            }
+        }
+
+        CancelarEdicion();
+        await CargarFacturas();
+    }
+
+    private void AgregarOActualizarArticuloTemp()
+    {
+        if (string.IsNullOrWhiteSpace(nuevoArticulo.Nombre) || nuevoArticulo.Cantidad <= 0 || nuevoArticulo.Precio <= 0)
+        {
+            return;
+        }
+
+        if (nuevoArticulo.Id == 0)
+        {
+            articulosTemp.Add(new ArticuloModel
+            {
+                Id = 0,
+                Nombre = nuevoArticulo.Nombre,
+                Cantidad = nuevoArticulo.Cantidad,
+                Precio = nuevoArticulo.Precio
+            });
+        }
+        else
+        {
+            var articuloExistente = articulosTemp.FirstOrDefault(a => a.Id == nuevoArticulo.Id);
+            if (articuloExistente != null)
+            {
+                articuloExistente.Nombre = nuevoArticulo.Nombre;
+                articuloExistente.Cantidad = nuevoArticulo.Cantidad;
+                articuloExistente.Precio = nuevoArticulo.Precio;
+            }
+        }
+
+        nuevoArticulo = new ArticuloModel();
+    }
+
+    private void CargarArticuloParaEditar(ArticuloModel articulo)
+    {
+        nuevoArticulo = new ArticuloModel
+        {
+            Id = articulo.Id,
+            FacturaId = articulo.FacturaId,
+            Nombre = articulo.Nombre,
+            Cantidad = articulo.Cantidad,
+            Precio = articulo.Precio
+        };
+    }
+
+    private void EliminarArticuloTemp(ArticuloModel articulo)
+    {
+        articulosTemp.Remove(articulo);
+
+        if (articulo.Id > 0)
+        {
+            articulosIdsParaEliminar.Add(articulo.Id);
+        }
+    }
+
+    private async Task EliminarFactura(FacturaModel f)
+    {
+        await ServicioFacturas.EliminarFactura(f);
+        await CargarFacturas();
+    }
+}
