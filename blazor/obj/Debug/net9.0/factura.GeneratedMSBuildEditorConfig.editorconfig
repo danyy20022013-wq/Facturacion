@@ -24,16 +24,24 @@ build_property.EnableCodeStyleSeverity =
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xBcHAucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/danyy/OneDrive/Escritorio/Facturacion/blazor/Components/Pages/Error.razor]
-build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xFcnJvci5yYXpvcg==
+[C:/Users/danyy/OneDrive/Escritorio/Facturacion/blazor/Components/pages/DetalleFactura.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xwYWdlc1xEZXRhbGxlRmFjdHVyYS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/danyy/OneDrive/Escritorio/Facturacion/blazor/Components/Pages/Factura.razor]
-build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xGYWN0dXJhLnJhem9y
+[C:/Users/danyy/OneDrive/Escritorio/Facturacion/blazor/Components/pages/Error.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xwYWdlc1xFcnJvci5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/danyy/OneDrive/Escritorio/Facturacion/blazor/Components/Pages/Home.razor]
-build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xIb21lLnJhem9y
+[C:/Users/danyy/OneDrive/Escritorio/Facturacion/blazor/Components/pages/Home.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xwYWdlc1xIb21lLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/danyy/OneDrive/Escritorio/Facturacion/blazor/Components/pages/ListaFacturas.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xwYWdlc1xMaXN0YUZhY3R1cmFzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/danyy/OneDrive/Escritorio/Facturacion/blazor/Components/pages/VistaFactura.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xwYWdlc1xWaXN0YUZhY3R1cmEucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/danyy/OneDrive/Escritorio/Facturacion/blazor/Components/Routes.razor]

@@ -1,6 +1,35 @@
 ﻿@inherits LayoutComponentBase
 
-@Body
+<style>
+    .top-bar {
+        background-color: #3da53d; /* Verde Taxi LM */
+        color: white;
+        padding: 15px 20px;
+        display: flex;
+        justify-content: center; /* Centrado */
+        align-items: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .top-bar-title {
+        font-weight: bold;
+        font-size: 1.2em;
+    }
+
+    .main-content {
+        padding: 20px;
+    }
+</style>
+
+<div class="top-bar">
+    <span class="top-bar-title">
+        Portal de Facturación - Taxi LM
+    </span>
+</div>
+
+<div class="main-content">
+    @Body
+</div>
 
 <div id="blazor-error-ui" data-nosnippet>
     An unhandled error has occurred.

@@ -1,7 +1,42 @@
 ﻿@page "/"
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Home - Taxi LM</PageTitle>
 
-<h1>Hello, world!</h1>
+<style>
+    :root {
+        --taxi-verde: #3da53d;
+        --taxi-amarillo: #fdd835;
+        --taxi-rojo: #d32f2f;
+        --taxi-texto-oscuro: #333;
+    }
 
-Welcome to your new app.
+    .btn-principal {
+        background-color: var(--taxi-verde);
+        color: white;
+        border: 1px solid #2e7d32;
+        padding: 10px 20px;
+        cursor: pointer;
+        font-weight: bold;
+        text-decoration: none;
+        display: inline-block;
+        margin-top: 20px;
+        font-size: 1.1em;
+        border-radius: 4px;
+        transition: background-color 0.3s;
+    }
+
+        .btn-principal:hover {
+            background-color: #2e7d32;
+        }
+</style>
+
+<div style="text-align: center; padding: 50px;">
+    <h1>Bienvenido al Portal de Facturación</h1>
+    <img src="image_465207.png" alt="Logo Taxi LM" style="width: 150px; height: 150px; border-radius: 10px;" />
+
+    <p style="font-size: 1.2em; margin-top: 10px;">Facturación en línea de Taxi LM (Los Mochis)</p>
+
+    <a href="/Facturas" class="btn-principal">
+        Ir a Facturación
+    </a>
+</div>

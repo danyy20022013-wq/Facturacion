@@ -1,23 +1,24 @@
-﻿using factura.Components.Data;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
-namespace factura.Components.Data
+namespace facturas.Components.Data
 {
-    public class Factura
+    public class Facturas
     {
         public int Id { get; set; }
         public DateTime Fecha { get; set; } = DateTime.Now;
         public string Cliente { get; set; } = "";
-        public List<Articulo> Articulos { get; set; } = new();
+
+
+        public List<Viaje> Viajes { get; set; } = new();
 
         public decimal Total
         {
             get
             {
                 decimal suma = 0;
-                foreach (var a in Articulos)
-                    suma += a.Subtotal;
+                foreach (var v in Viajes)
+                    suma += v.Subtotal;
                 return suma;
             }
         }

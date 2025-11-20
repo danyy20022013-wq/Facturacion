@@ -1,0 +1,141 @@
+﻿@page "/DetalleFactura/{FacturaId:int}"
+@using facturas.Components.Data
+@using FacturaModel = facturas.Components.Data.Facturas
+@using ViajeModel = facturas.Components.Data.Viaje
+@using Microsoft.AspNetCore.Components
+@rendermode InteractiveServer
+
+<style>
+    :root {
+        --taxi-verde: #3da53d;
+    }
+
+    .contenedor-detalle {
+        border: 1px solid #ddd;
+        border-top: 5px solid var(--taxi-verde);
+        padding: 25px;
+        background-color: #ffffff;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        border-radius: 5px;
+    }
+
+    .info-header {
+        border-bottom: 2px solid #eee;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+    }
+
+    .tabla-registro {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+
+        .tabla-registro th, .tabla-registro td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .tabla-registro th {
+            background-color: var(--taxi-verde);
+            color: white;
+            font-weight: bold;
+        }
+
+    .pie-tabla-detalle {
+        font-weight: bold;
+        text-align: right;
+        padding: 10px 0;
+        font-size: 1.2em;
+        border-top: 2px solid var(--taxi-verde);
+        margin-top: 10px;
+    }
+
+    .btn-simple {
+        background-color: var(--taxi-verde);
+        color: white;
+        border: 1px solid #2e7d32;
+        padding: 10px 20px;
+        cursor: pointer;
+        margin-top: 20px;
+        border-radius: 4px;
+        font-weight: bold;
+    }
+
+        .btn-simple:hover {
+            background-color: #2e7d32;
+        }
+</style>
+
+<h1>Detalle de Factura #@FacturaId</h1>
+
+@if (factura == null)
+{
+    <p>Cargando detalles o factura no encontrada...</p>
+}
+else
+{
+    <div class="contenedor-detalle">
+        <div class="info-header">
+            <p style="font-size: 1.1em;"><strong>Cliente:</strong> @factura.Cliente</p>
+            <p style="font-size: 1.1em;"><strong>Fecha de Emisión:</strong> @factura.Fecha.ToShortDateString()</p>
+        </div>
+
+        <h3 style="margin-top: 20px;">Viajes Facturados</h3>
+
+        <table class="tabla-registro">
+            <thead>
+                <tr>
+                    <th style="width: 40%;">Descripción</th>
+                    <th style="width: 30%;">Folio / Referencia</th>
+                    <th style="width: 30%;">Monto</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var v in factura.Viajes)
+                {
+                    <tr>
+                        <td>@v.Descripcion</td>
+                        <td>@v.Folio</td>
+                        <td>@v.Monto.ToString("C2")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <div class="pie-tabla-detalle">
+            TOTAL DE LA FACTURA: $@factura.Total.ToString("C2")
+        </div>
+
+        <button @onclick='() => Navegacion.NavigateTo("/ListaFacturas")' class="btn-simple">
+            Volver al Historial
+        </button>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int FacturaId { get; set; }
+
+    private FacturaModel factura;
+
+    [Inject]
+    public NavigationManager Navegacion { get; set; }
+
+    [Inject]
+    public ServicioFacturas ServicioFacturas { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            factura = await ServicioFacturas.ObtenerFacturaPorId(FacturaId);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al cargar el detalle: {ex.Message}");
+            factura = null;
+        }
+    }
+}

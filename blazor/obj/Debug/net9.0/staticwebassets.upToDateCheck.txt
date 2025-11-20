@@ -1,0 +1,2 @@
+wwwroot\app.css
+C:\Users\danyy\OneDrive\Escritorio\Facturacion\blazor\wwwroot\app.css

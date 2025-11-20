@@ -1,0 +1,206 @@
+﻿@page "/ListaFacturas"
+@using facturas.Components.Data
+@using FacturaModel = facturas.Components.Data.Facturas
+@using Microsoft.AspNetCore.Components
+@rendermode InteractiveServer
+
+<style>
+    :root {
+        --taxi-verde: #3da53d;
+        --taxi-amarillo: #fdd835;
+        --taxi-rojo: #d32f2f;
+        --taxi-texto-oscuro: #333;
+        --taxi-gris-claro: #f7f7f7;
+    }
+
+    .seccion-baja {
+        border: 1px solid #ddd;
+        border-top: 5px solid var(--taxi-verde);
+        padding: 20px;
+        margin-bottom: 20px;
+        background-color: #ffffff;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        border-radius: 5px;
+    }
+
+    .tabla-registro {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+
+        .tabla-registro th, .tabla-registro td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+            font-size: 0.9em;
+        }
+
+        .tabla-registro th {
+            background-color: var(--taxi-verde);
+            color: white;
+            font-weight: bold;
+        }
+
+    .pie-tabla {
+        font-weight: bold;
+        text-align: right;
+        padding: 5px 0;
+        border-top: 2px solid var(--taxi-verde);
+        margin-top: 5px;
+        font-size: 1.1em;
+    }
+
+    .btn-simple {
+        background-color: var(--taxi-amarillo);
+        color: var(--taxi-texto-oscuro);
+        border: 1px solid #fbc02d;
+        padding: 8px 12px;
+        cursor: pointer;
+        font-size: 0.9em;
+        border-radius: 4px;
+        font-weight: bold;
+    }
+
+    .btn-navegacion {
+        background-color: var(--taxi-verde);
+        color: white;
+        border: 1px solid #2e7d32;
+    }
+
+        .btn-navegacion:hover {
+            background-color: #2e7d32;
+        }
+
+    .btn-eliminar-simple {
+        background-color: var(--taxi-rojo);
+        color: white;
+        border: none;
+        padding: 6px 10px;
+        border-radius: 4px;
+    }
+
+    .enlace-detalle {
+        color: var(--taxi-verde);
+        text-decoration: underline;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    .campo-texto {
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+</style>
+
+<h1>Historial de Facturas Guardadas</h1>
+
+<div class="seccion-baja" style="display: flex; gap: 10px; align-items: center;">
+    <label>Filtrar por Cliente:</label>
+    <input type="text" @bind-value="filtroCliente" @oninput="FiltrarFacturas" class="campo-texto" style="width: 300px;" />
+    <button @onclick="LimpiarFiltro" class="btn-simple">Limpiar</button>
+</div>
+
+@if (facturas == null)
+{
+    <p>Cargando registros...</p>
+}
+else
+{
+    <div style="text-align: center; margin-bottom: 20px;">
+        <button @onclick='() => Navegacion.NavigateTo("/Facturas")' class="btn-simple btn-navegacion" style="padding: 10px 20px;">
+            Volver a Crear Factura
+        </button>
+    </div>
+
+    @if (facturasFiltradas.Count == 0)
+    {
+        <p>No hay facturas que coincidan con el filtro o el sistema está vacío.</p>
+    }
+    else
+    {
+        @foreach (var f in facturasFiltradas)
+        {
+            <div class="seccion-baja" style="background-color: #fdfdfd;">
+                <div style="border-bottom: 1px dashed #ccc; padding-bottom: 10px; margin-bottom: 10px;">
+                    <h4 style="margin: 0;">
+                        Factura ID:
+                        <a @onclick='() => Navegacion.NavigateTo($"/DetalleFactura/{f.Id}")' class="enlace-detalle">
+                            #@f.Id
+                        </a>
+                    </h4>
+                    <p style="margin: 5px 0 0 0;">Cliente: <strong>@f.Cliente</strong></p>
+                    <p style="margin: 0;">Fecha: <strong>@f.Fecha.ToShortDateString()</strong></p>
+                </div>
+
+                <div class="pie-tabla" style="margin-top: 0; border-top-color: #eee;">
+                    TOTAL: $@f.Total.ToString("C2")
+                </div>
+
+                <button @onclick="() => EliminarFactura(f)" class="btn-simple btn-eliminar-simple" style="margin-top: 10px;">Eliminar Factura</button>
+            </div>
+        }
+    }
+}
+
+@code {
+    private List<FacturaModel> facturas;
+    private List<FacturaModel> facturasFiltradas;
+    private string filtroCliente = string.Empty;
+
+    [Inject]
+    public NavigationManager Navegacion { get; set; }
+
+    [Inject]
+    public ServicioFacturas ServicioFacturas { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            facturas = await ServicioFacturas.ObtenerFacturas();
+            AplicarFiltro();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error DB: {ex.Message}");
+            facturas = new List<FacturaModel>();
+            facturasFiltradas = new List<FacturaModel>();
+        }
+    }
+
+    private void FiltrarFacturas(ChangeEventArgs e)
+    {
+        filtroCliente = e.Value?.ToString() ?? string.Empty;
+        AplicarFiltro();
+    }
+
+    private void AplicarFiltro()
+    {
+        if (string.IsNullOrWhiteSpace(filtroCliente))
+        {
+            facturasFiltradas = facturas;
+        }
+        else
+        {
+            facturasFiltradas = facturas
+                .Where(f => f.Cliente.Contains(filtroCliente, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
+        StateHasChanged();
+    }
+
+    private void LimpiarFiltro()
+    {
+        filtroCliente = string.Empty;
+        AplicarFiltro();
+    }
+
+    private async Task EliminarFactura(FacturaModel f)
+    {
+        await ServicioFacturas.EliminarFactura(f);
+        facturas = await ServicioFacturas.ObtenerFacturas();
+        AplicarFiltro();
+    }
+}
