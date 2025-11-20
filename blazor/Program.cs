@@ -10,7 +10,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-// Registramos el servicio de facturas
 builder.Services.AddSingleton<ServicioFacturas>();
 
 var app = builder.Build();
@@ -28,7 +27,6 @@ app.UseAntiforgery();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 
-// Configuración de la Base de Datos
 string rutaDb = Path.Combine(AppContext.BaseDirectory, "facturas.db");
 
 using (var cx = new SqliteConnection($"Data Source={rutaDb}"))
@@ -43,10 +41,15 @@ using (var cx = new SqliteConnection($"Data Source={rutaDb}"))
             cliente TEXT
         );
 
-        /* Lógica de Viajes (Fase 3) */
+        /* Eliminamos la tabla anterior para recrearla con el nuevo campo */
+        DROP TABLE IF EXISTS articulos; 
+        /* Nota: Si ya existe 'viajes' sin la columna tipo, esto no la altera automáticamente.
+           Por eso recomendamos borrar el archivo .db al reiniciar */
+        
         CREATE TABLE IF NOT EXISTS viajes(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             facturaId INTEGER,
+            tipo TEXT,  /* Nuevo Campo */
             descripcion TEXT,
             folio TEXT,
             monto REAL DEFAULT 0

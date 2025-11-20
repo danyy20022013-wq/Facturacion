@@ -1,4 +1,5 @@
 ﻿@page "/Facturas"
+@page "/Factura/{Id:int}"
 @using facturas.Components.Data
 @using FacturaModel = facturas.Components.Data.Facturas
 @using ViajeModel = facturas.Components.Data.Viaje
@@ -91,16 +92,6 @@
         font-weight: bold;
     }
 
-    .btn-navegacion {
-        background-color: #007bff;
-        color: white;
-        border: none;
-    }
-
-        .btn-navegacion:hover {
-            background-color: #0056b3;
-        }
-
     .msg-error {
         color: var(--taxi-rojo);
         margin-top: 10px;
@@ -119,40 +110,62 @@
         margin-top: 5px;
         font-size: 1.1em;
     }
+
+    .campo-select {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        background-color: white;
+    }
+
+    .btn-eliminar-item {
+        background-color: #e57373;
+        color: white;
+        border: none;
+        padding: 4px 8px;
+        font-size: 0.8em;
+        cursor: pointer;
+        border-radius: 3px;
+    }
 </style>
 
-<h1>Portal de Facturación - Taxi LM</h1>
+<h1>@(Id.HasValue ? $"Editar Factura #{Id}" : "Crear Nueva Factura")</h1>
 
 <div class="seccion-baja">
-    <h3>Crear Nueva Factura</h3>
-
     <div class="input-grupo">
         <label style="display: block; font-weight: bold; margin-bottom: 5px;">Fecha:</label>
-        <input type="date" @bind-value="nuevaFactura.Fecha" class="campo-texto" />
+        <input type="date" @bind-value="facturaActual.Fecha" class="campo-texto" />
     </div>
 
     <div class="input-grupo">
-        <label style="display: block; font-weight: bold; margin-bottom: 5px;">Cliente (Nombre o Razón Social):</label>
-        <input @bind="nuevaFactura.Cliente" placeholder="Nombre de la persona o empresa" class="campo-texto" />
+        <label style="display: block; font-weight: bold; margin-bottom: 5px;">Cliente:</label>
+        <input @bind="facturaActual.Cliente" placeholder="Nombre del cliente" class="campo-texto" />
     </div>
 
-    <h4 style="margin-top: 25px; border-bottom: 2px solid #eee; padding-bottom: 5px;">Viajes a Facturar</h4>
+    <h4 style="margin-top: 25px; border-bottom: 2px solid #eee; padding-bottom: 5px;">Viajes</h4>
 
     <table class="tabla-registro">
         <thead>
             <tr>
-                <th style="width: 40%;">Descripción</th>
-                <th style="width: 30%;">Folio / Referencia</th>
-                <th style="width: 30%;">Monto</th>
+                <th style="width: 15%;">Tipo</th>
+                <th style="width: 30%;">Descripción</th>
+                <th style="width: 25%;">Folio</th>
+                <th style="width: 20%;">Monto</th>
+                <th style="width: 10%;">Acción</th>
             </tr>
         </thead>
         <tbody>
             @foreach (var v in viajesTemp)
             {
                 <tr>
+                    <td>@v.Tipo</td>
                     <td>@v.Descripcion</td>
                     <td>@v.Folio</td>
                     <td>@v.Monto.ToString("C2")</td>
+                    <td style="text-align: center;">
+                        <button @onclick="() => EliminarViajeTemp(v)" class="btn-eliminar-item">X</button>
+                    </td>
                 </tr>
             }
         </tbody>
@@ -161,16 +174,25 @@
     @if (viajesTemp.Count > 0)
     {
         <div class="pie-tabla">
-            TOTAL (Borrador): @viajesTemp.Sum(v => v.Subtotal).ToString("C2")
+            TOTAL: @viajesTemp.Sum(v => v.Subtotal).ToString("C2")
         </div>
     }
 
-    <div style="margin-top: 10px; font-weight: bold;">Agregar nuevo viaje:</div>
+    <div style="margin-top: 15px; font-weight: bold; color: var(--taxi-texto-oscuro);">Agregar viaje:</div>
     <div class="fila-articulos">
-        <input placeholder="Descripción (Ej: Viaje App, Nota Manual)" @bind="nuevoViaje.Descripcion" class="campo-texto" style="flex: 2 1 200px;" />
-        <input placeholder="Folio / Referencia" @bind="nuevoViaje.Folio" class="campo-texto" style="flex: 1 1 150px;" />
-        <input type="number" step="0.01" placeholder="Monto" @bind="nuevoViaje.Monto" class="campo-texto" style="flex: 1 1 100px;" />
-        <button @onclick="AgregarViajeTemp" class="btn-simple" style="flex: 1 1 100%;">Agregar Viaje</button>
+        <select @bind="nuevoViaje.Tipo" class="campo-select" style="flex: 1 1 120px;">
+            <option value="Local">Local</option>
+            <option value="Foraneo">Foráneo</option>
+            <option value="Compra">De Compras</option>
+            <option value="Aeropuerto">Aeropuerto</option>
+            <option value="Especial">Especial</option>
+        </select>
+
+        <input placeholder="Descripción" @bind="nuevoViaje.Descripcion" class="campo-texto" style="flex: 2 1 180px;" />
+        <input placeholder="Folio" @bind="nuevoViaje.Folio" class="campo-texto" style="flex: 1 1 100px;" />
+        <input type="number" step="0.01" placeholder="Monto" @bind="nuevoViaje.Monto" class="campo-texto" style="flex: 1 1 80px;" />
+
+        <button @onclick="AgregarViajeTemp" class="btn-simple" style="flex: 1 1 100%;">+ Agregar</button>
     </div>
 
     @if (!string.IsNullOrWhiteSpace(mensajeError))
@@ -178,74 +200,106 @@
         <p class="msg-error">! @mensajeError</p>
     }
 
-    <button @onclick="GuardarFactura" class="btn-simple btn-guardar" style="width: 100%; margin-top: 20px; padding: 10px;">GUARDAR FACTURA FINAL</button>
-</div>
-
-<hr style="border-top: 1px solid #ccc; margin: 25px 0;" />
-
-<div style="text-align: center;">
-    <button @onclick='() => Navegacion.NavigateTo("/ListaFacturas")' class="btn-simple btn-navegacion" style="padding: 10px 20px;">
-        Ver Historial de Facturas Guardadas
+    <button @onclick="GuardarFactura" class="btn-simple btn-guardar" style="width: 100%; margin-top: 20px; padding: 12px;">
+        @(Id.HasValue ? "GUARDAR CAMBIOS" : "CREAR FACTURA")
     </button>
 </div>
 
+<div style="text-align: center; margin-top: 20px;">
+    <button @onclick='() => Navegacion.NavigateTo("/ListaFacturas")' class="btn-simple" style="background-color: #007bff; color: white;">
+        Volver al Historial
+    </button>
+</div>
 
 @code {
-    private FacturaModel nuevaFactura = new() { Fecha = DateTime.Now.Date };
-    private ViajeModel nuevoViaje = new();
+    [Parameter]
+    public int? Id { get; set; }
+
+    private FacturaModel facturaActual = new() { Fecha = DateTime.Now.Date };
+    private ViajeModel nuevoViaje = new() { Tipo = "Local" }; 
     private List<ViajeModel> viajesTemp = new();
     private string mensajeError = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Id.HasValue)
+        {
+           
+            var f = await ServicioFacturas.ObtenerFacturaPorId(Id.Value);
+            if (f != null)
+            {
+                facturaActual = f;
+                
+                viajesTemp = new List<ViajeModel>(f.Viajes);
+            }
+            else
+            {
+                mensajeError = "Factura no encontrada.";
+            }
+        }
+    }
 
     private async Task GuardarFactura()
     {
         mensajeError = string.Empty;
-        if (string.IsNullOrWhiteSpace(nuevaFactura.Cliente))
+        if (string.IsNullOrWhiteSpace(facturaActual.Cliente))
         {
             mensajeError = "El campo 'Cliente' es obligatorio.";
+            return;
         }
-        else if (viajesTemp.Count == 0)
+        if (viajesTemp.Count == 0)
         {
-            mensajeError = "Debe agregar al menos un viaje a la factura.";
+            mensajeError = "Debe haber al menos un viaje.";
+            return;
         }
 
-        if (string.IsNullOrWhiteSpace(mensajeError))
+        try
         {
-            try
+            facturaActual.Viajes = new List<ViajeModel>(viajesTemp);
+
+            if (Id.HasValue)
             {
-                nuevaFactura.Viajes = new List<ViajeModel>(viajesTemp);
-                await ServicioFacturas.AgregarFactura(nuevaFactura);
-
-                Navegacion.NavigateTo("/ListaFacturas");
-
-                nuevaFactura = new FacturaModel() { Fecha = DateTime.Now.Date };
-                nuevoViaje = new ViajeModel();
-                viajesTemp = new List<ViajeModel>();
+               
+                await ServicioFacturas.ActualizarFactura(facturaActual);
             }
-            catch (Exception ex)
+            else
             {
-                mensajeError = $"Ocurrió un error inesperado: {ex.Message}";
+             
+                await ServicioFacturas.AgregarFactura(facturaActual);
             }
 
-            StateHasChanged();
+            Navegacion.NavigateTo("/ListaFacturas");
+        }
+        catch (Exception ex)
+        {
+            mensajeError = $"Error: {ex.Message}";
         }
     }
 
     private void AgregarViajeTemp()
     {
+        if (nuevoViaje.Monto <= 0)
+        {
+            mensajeError = "El monto debe ser mayor a 0.";
+            return;
+        }
+
+        viajesTemp.Add(new ViajeModel
+        {
+            Tipo = nuevoViaje.Tipo,
+            Descripcion = nuevoViaje.Descripcion,
+            Folio = nuevoViaje.Folio,
+            Monto = nuevoViaje.Monto
+        });
+
+       
+        string tipoPrevio = nuevoViaje.Tipo;
+        nuevoViaje = new ViajeModel { Tipo = tipoPrevio };
         mensajeError = string.Empty;
-        if (string.IsNullOrWhiteSpace(nuevoViaje.Descripcion) || nuevoViaje.Monto <= 0)
-        {
-            mensajeError = "Debe especificar una descripción y un monto (>0) para el viaje.";
-        }
-        else
-        {
-            viajesTemp.Add(new ViajeModel
-            {
-                Descripcion = nuevoViaje.Descripcion,
-                Folio = nuevoViaje.Folio,
-                Monto = nuevoViaje.Monto
-            });
-            nuevoViaje = new ViajeModel();
-        }
+    }
+
+    private void EliminarViajeTemp(ViajeModel v)
+    {
+        viajesTemp.Remove(v);
     }
 }
