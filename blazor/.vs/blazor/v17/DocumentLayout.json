@@ -3,6 +3,10 @@
   "WorkspaceRootPath": "C:\\Users\\danyy\\OneDrive\\Escritorio\\Facturacion\\blazor\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{284CFCE1-D636-37BC-67A1-6975A0FFF202}|factura.csproj|c:\\users\\danyy\\onedrive\\escritorio\\facturacion\\blazor\\components\\layout\\mainlayout.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{284CFCE1-D636-37BC-67A1-6975A0FFF202}|factura.csproj|solutionrelative:components\\layout\\mainlayout.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{284CFCE1-D636-37BC-67A1-6975A0FFF202}|factura.csproj|c:\\users\\danyy\\onedrive\\escritorio\\facturacion\\blazor\\components\\data\\serviciofacturas.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{284CFCE1-D636-37BC-67A1-6975A0FFF202}|factura.csproj|solutionrelative:components\\data\\serviciofacturas.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -17,10 +21,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{284CFCE1-D636-37BC-67A1-6975A0FFF202}|factura.csproj|c:\\users\\danyy\\onedrive\\escritorio\\facturacion\\blazor\\components\\pages\\reportes.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{284CFCE1-D636-37BC-67A1-6975A0FFF202}|factura.csproj|solutionrelative:components\\pages\\reportes.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{284CFCE1-D636-37BC-67A1-6975A0FFF202}|factura.csproj|c:\\users\\danyy\\onedrive\\escritorio\\facturacion\\blazor\\components\\layout\\mainlayout.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{284CFCE1-D636-37BC-67A1-6975A0FFF202}|factura.csproj|solutionrelative:components\\layout\\mainlayout.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{284CFCE1-D636-37BC-67A1-6975A0FFF202}|factura.csproj|c:\\users\\danyy\\onedrive\\escritorio\\facturacion\\blazor\\components\\pages\\reportes.razor||{8B382828-6202-11D1-8870-0000F87579D2}",
@@ -66,23 +66,11 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 3,
+          "SelectedChildIndex": 5,
           "Children": [
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "DetalleFactura.razor",
-              "DocumentMoniker": "C:\\Users\\danyy\\OneDrive\\Escritorio\\Facturacion\\blazor\\Components\\pages\\DetalleFactura.razor",
-              "RelativeDocumentMoniker": "Components\\pages\\DetalleFactura.razor",
-              "ToolTip": "C:\\Users\\danyy\\OneDrive\\Escritorio\\Facturacion\\blazor\\Components\\pages\\DetalleFactura.razor",
-              "RelativeToolTip": "Components\\pages\\DetalleFactura.razor",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAHwAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-11-20T00:28:17.42Z"
             },
             {
               "$type": "Document",
@@ -98,7 +86,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "ServicioFacturas.cs",
               "DocumentMoniker": "C:\\Users\\danyy\\OneDrive\\Escritorio\\Facturacion\\blazor\\Components\\Data\\ServicioFacturas.cs",
               "RelativeDocumentMoniker": "Components\\Data\\ServicioFacturas.cs",
@@ -111,7 +99,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "ListaFacturas.razor",
               "DocumentMoniker": "C:\\Users\\danyy\\OneDrive\\Escritorio\\Facturacion\\blazor\\Components\\pages\\ListaFacturas.razor",
               "RelativeDocumentMoniker": "Components\\pages\\ListaFacturas.razor",
@@ -135,19 +123,32 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 0,
               "Title": "MainLayout.razor",
               "DocumentMoniker": "C:\\Users\\danyy\\OneDrive\\Escritorio\\Facturacion\\blazor\\Components\\Layout\\MainLayout.razor",
               "RelativeDocumentMoniker": "Components\\Layout\\MainLayout.razor",
               "ToolTip": "C:\\Users\\danyy\\OneDrive\\Escritorio\\Facturacion\\blazor\\Components\\Layout\\MainLayout.razor",
               "RelativeToolTip": "Components\\Layout\\MainLayout.razor",
-              "ViewState": "AgIAABUAAAAAAAAAAAAAACAAAAAKAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAMAAAAEAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-11-20T00:26:19.781Z"
+              "WhenOpened": "2025-11-20T00:26:19.781Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 6,
+              "Title": "DetalleFactura.razor",
+              "DocumentMoniker": "C:\\Users\\danyy\\OneDrive\\Escritorio\\Facturacion\\blazor\\Components\\pages\\DetalleFactura.razor",
+              "RelativeDocumentMoniker": "Components\\pages\\DetalleFactura.razor",
+              "ToolTip": "C:\\Users\\danyy\\OneDrive\\Escritorio\\Facturacion\\blazor\\Components\\pages\\DetalleFactura.razor",
+              "RelativeToolTip": "Components\\pages\\DetalleFactura.razor",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAHwAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-11-20T00:28:17.42Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
               "Title": "Reportes.razor",
               "DocumentMoniker": "C:\\Users\\danyy\\OneDrive\\Escritorio\\Facturacion\\blazor\\Components\\pages\\Reportes.razor",
               "RelativeDocumentMoniker": "Components\\pages\\Reportes.razor",
@@ -183,7 +184,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "VistaFactura.razor",
               "DocumentMoniker": "C:\\Users\\danyy\\OneDrive\\Escritorio\\Facturacion\\blazor\\Components\\pages\\VistaFactura.razor",
               "RelativeDocumentMoniker": "Components\\pages\\VistaFactura.razor",
