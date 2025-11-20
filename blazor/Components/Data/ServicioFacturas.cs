@@ -10,6 +10,7 @@ namespace facturas.Components.Data
     {
         private string RutaDb => Path.Combine(AppContext.BaseDirectory, "facturas.db");
 
+       
         public async Task<List<Facturas>> ObtenerFacturas()
         {
             var lista = new List<Facturas>();
@@ -65,7 +66,6 @@ namespace facturas.Components.Data
             await cx.OpenAsync();
 
             var cmd = cx.CreateCommand();
-            
             cmd.CommandText = "SELECT id, descripcion, folio, monto, tipo FROM viajes WHERE facturaId = $id";
             cmd.Parameters.AddWithValue("$id", facturaId);
 
@@ -79,7 +79,7 @@ namespace facturas.Components.Data
                     Descripcion = rd.GetString(1),
                     Folio = rd.IsDBNull(2) ? "" : rd.GetString(2),
                     Monto = (decimal)rd.GetDouble(3),
-                    Tipo = rd.IsDBNull(4) ? "Local" : rd.GetString(4) 
+                    Tipo = rd.IsDBNull(4) ? "Local" : rd.GetString(4)
                 });
             }
             return lista;
@@ -96,25 +96,16 @@ namespace facturas.Components.Data
             cmd.Parameters.AddWithValue("$cliente", f.Cliente);
 
             object result = await cmd.ExecuteScalarAsync();
+            if (result != null && result != DBNull.Value) f.Id = (int)(long)result;
 
-            if (result != null && result != DBNull.Value)
-            {
-                f.Id = (int)(long)result;
-            }
-
-            foreach (var v in f.Viajes)
-            {
-                await AgregarViaje(f.Id, v);
-            }
+            foreach (var v in f.Viajes) await AgregarViaje(f.Id, v);
         }
 
-       
         public async Task ActualizarFactura(Facturas f)
         {
             using var cx = new SqliteConnection($"Data Source={RutaDb}");
             await cx.OpenAsync();
 
-            
             var cmdUpdate = cx.CreateCommand();
             cmdUpdate.CommandText = "UPDATE facturas SET fecha = $fecha, cliente = $cliente WHERE id = $id";
             cmdUpdate.Parameters.AddWithValue("$fecha", f.Fecha.ToString("yyyy-MM-dd"));
@@ -122,17 +113,12 @@ namespace facturas.Components.Data
             cmdUpdate.Parameters.AddWithValue("$id", f.Id);
             await cmdUpdate.ExecuteNonQueryAsync();
 
-            
             var cmdDel = cx.CreateCommand();
             cmdDel.CommandText = "DELETE FROM viajes WHERE facturaId = $id";
             cmdDel.Parameters.AddWithValue("$id", f.Id);
             await cmdDel.ExecuteNonQueryAsync();
 
-           
-            foreach (var v in f.Viajes)
-            {
-                await AgregarViaje(f.Id, v);
-            }
+            foreach (var v in f.Viajes) await AgregarViaje(f.Id, v);
         }
 
         private async Task AgregarViaje(int facturaId, Viaje v)
@@ -141,14 +127,12 @@ namespace facturas.Components.Data
             await cx.OpenAsync();
 
             var cmd = cx.CreateCommand();
-           
             cmd.CommandText = "INSERT INTO viajes(facturaId, descripcion, folio, monto, tipo) VALUES($facturaId, $descripcion, $folio, $monto, $tipo)";
             cmd.Parameters.AddWithValue("$facturaId", facturaId);
             cmd.Parameters.AddWithValue("$descripcion", v.Descripcion);
             cmd.Parameters.AddWithValue("$folio", v.Folio);
             cmd.Parameters.AddWithValue("$monto", v.Monto);
-            cmd.Parameters.AddWithValue("$tipo", v.Tipo); 
-
+            cmd.Parameters.AddWithValue("$tipo", v.Tipo);
             await cmd.ExecuteNonQueryAsync();
         }
 
@@ -156,16 +140,83 @@ namespace facturas.Components.Data
         {
             using var cx = new SqliteConnection($"Data Source={RutaDb}");
             await cx.OpenAsync();
-
             var cmd1 = cx.CreateCommand();
             cmd1.CommandText = "DELETE FROM viajes WHERE facturaId = $id";
             cmd1.Parameters.AddWithValue("$id", f.Id);
             await cmd1.ExecuteNonQueryAsync();
-
             var cmd2 = cx.CreateCommand();
             cmd2.CommandText = "DELETE FROM facturas WHERE id = $id";
             cmd2.Parameters.AddWithValue("$id", f.Id);
             await cmd2.ExecuteNonQueryAsync();
         }
+
+
+        public async Task<List<ReporteDato>> ObtenerIngresosPorTipo()
+        {
+            return await EjecutarConsultaReporte("SELECT tipo, SUM(monto) FROM viajes GROUP BY tipo ORDER BY SUM(monto) DESC");
+        }
+
+        
+        public async Task<List<ReporteDato>> ObtenerMejoresClientes()
+        {
+            return await EjecutarConsultaReporte(@"
+                SELECT f.cliente, SUM(v.monto) 
+                FROM facturas f JOIN viajes v ON f.id = v.facturaId 
+                GROUP BY f.cliente ORDER BY SUM(v.monto) DESC LIMIT 5");
+        }
+
+       
+        public async Task<List<ReporteDato>> ObtenerVentasPorMes()
+        {
+            return await EjecutarConsultaReporte(@"
+                SELECT strftime('%Y-%m', f.fecha), SUM(v.monto) 
+                FROM facturas f JOIN viajes v ON f.id = v.facturaId 
+                GROUP BY strftime('%Y-%m', f.fecha) ORDER BY 1 DESC");
+        }
+
+        
+        public async Task<List<ReporteDato>> ObtenerVolumenPorTipo()
+        {
+            
+            return await EjecutarConsultaReporte("SELECT tipo, COUNT(*) FROM viajes GROUP BY tipo ORDER BY COUNT(*) DESC");
+        }
+
+        
+        public async Task<decimal> ObtenerTicketPromedio()
+        {
+            using var cx = new SqliteConnection($"Data Source={RutaDb}");
+            await cx.OpenAsync();
+            var cmd = cx.CreateCommand();
+            cmd.CommandText = "SELECT AVG(TotalFactura) FROM (SELECT SUM(monto) as TotalFactura FROM viajes GROUP BY facturaId)";
+            var result = await cmd.ExecuteScalarAsync();
+            return result != null && result != DBNull.Value ? Convert.ToDecimal(result) : 0;
+        }
+
+        
+        private async Task<List<ReporteDato>> EjecutarConsultaReporte(string query)
+        {
+            var lista = new List<ReporteDato>();
+            using var cx = new SqliteConnection($"Data Source={RutaDb}");
+            await cx.OpenAsync();
+            var cmd = cx.CreateCommand();
+            cmd.CommandText = query;
+            using var rd = await cmd.ExecuteReaderAsync();
+            while (await rd.ReadAsync())
+            {
+                lista.Add(new ReporteDato
+                {
+                    Etiqueta = rd.GetString(0),
+                    Valor = rd.GetDecimal(1)
+                });
+            }
+            return lista;
+        }
+    }
+
+    
+    public class ReporteDato
+    {
+        public string Etiqueta { get; set; } 
+        public decimal Valor { get; set; }   
     }
 }

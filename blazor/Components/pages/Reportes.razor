@@ -1,0 +1,177 @@
+﻿@page "/Reportes"
+@using facturas.Components.Data
+@inject ServicioFacturas ServicioFacturas
+@rendermode InteractiveServer
+
+<style>
+    :root {
+        --taxi-verde: #3da53d;
+        --taxi-amarillo: #fdd835;
+        --taxi-gris-claro: #f7f7f7;
+    }
+
+    .contenedor-reportes {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        padding: 20px;
+    }
+
+    .tarjeta-reporte {
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 15px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        border-top: 4px solid var(--taxi-verde);
+    }
+
+    .titulo-reporte {
+        font-size: 1.1em;
+        font-weight: bold;
+        margin-bottom: 15px;
+        color: #333;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 5px;
+    }
+
+    .tabla-datos {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .tabla-datos td {
+            padding: 6px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+    .valor-destacado {
+        font-weight: bold;
+        color: var(--taxi-verde);
+        text-align: right;
+    }
+
+    .big-number {
+        font-size: 2.5em;
+        font-weight: bold;
+        color: var(--taxi-verde);
+        text-align: center;
+        margin: 20px 0;
+    }
+
+    .subtitulo {
+        text-align: center;
+        color: #666;
+    }
+</style>
+
+<h1>Tablero de Inteligencia - Taxi LM</h1>
+
+@if (cargando)
+{
+    <p>Calculando estadísticas...</p>
+}
+else
+{
+    <div class="contenedor-reportes">
+
+        <div class="tarjeta-reporte">
+            <div class="titulo-reporte">💰 Ingresos por Tipo de Viaje</div>
+            <table class="tabla-datos">
+                @foreach (var d in ingresosPorTipo)
+                {
+                    <tr>
+                        <td>@d.Etiqueta</td>
+                        <td class="valor-destacado">@d.Valor.ToString("C2")</td>
+                    </tr>
+                }
+            </table>
+        </div>
+
+        <div class="tarjeta-reporte">
+            <div class="titulo-reporte">🏆 Top 5 Clientes VIP</div>
+            <table class="tabla-datos">
+                @foreach (var d in mejoresClientes)
+                {
+                    <tr>
+                        <td>@d.Etiqueta</td>
+                        <td class="valor-destacado">@d.Valor.ToString("C2")</td>
+                    </tr>
+                }
+            </table>
+        </div>
+
+        <div class="tarjeta-reporte">
+            <div class="titulo-reporte">📅 Historial de Ventas (Mes)</div>
+            <table class="tabla-datos">
+                @foreach (var d in ventasPorMes)
+                {
+                    <tr>
+                        <td>@d.Etiqueta</td>
+                        <td class="valor-destacado">@d.Valor.ToString("C2")</td>
+                    </tr>
+                }
+            </table>
+        </div>
+
+        <div class="tarjeta-reporte">
+            <div class="titulo-reporte">🚕 Viajes Realizados (Cantidad)</div>
+            <table class="tabla-datos">
+                @foreach (var d in volumenPorTipo)
+                {
+                    <tr>
+                        <td>@d.Etiqueta</td>
+                        <td class="valor-destacado">@d.Valor.ToString("N0")</td>
+                    </tr>
+                }
+            </table>
+        </div>
+
+        <div class="tarjeta-reporte" style="display:flex; flex-direction:column; justify-content:center;">
+            <div class="titulo-reporte">📊 Ticket Promedio</div>
+            <div class="big-number">@ticketPromedio.ToString("C2")</div>
+            <div class="subtitulo">Promedio por factura emitida</div>
+        </div>
+
+    </div>
+
+    <div style="text-align: center; margin-top: 30px;">
+        <a href="/ListaFacturas" style="background-color: #3da53d; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; font-weight: bold;">Volver al Listado</a>
+    </div>
+}
+
+@code {
+    private bool cargando = true;
+    private List<ReporteDato> ingresosPorTipo = new();
+    private List<ReporteDato> mejoresClientes = new();
+    private List<ReporteDato> ventasPorMes = new();
+    private List<ReporteDato> volumenPorTipo = new();
+    private decimal ticketPromedio = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+           
+            var t1 = ServicioFacturas.ObtenerIngresosPorTipo();
+            var t2 = ServicioFacturas.ObtenerMejoresClientes();
+            var t3 = ServicioFacturas.ObtenerVentasPorMes();
+            var t4 = ServicioFacturas.ObtenerVolumenPorTipo();
+            var t5 = ServicioFacturas.ObtenerTicketPromedio();
+
+            await Task.WhenAll(t1, t2, t3, t4, t5);
+
+            ingresosPorTipo = t1.Result;
+            mejoresClientes = t2.Result;
+            ventasPorMes = t3.Result;
+            volumenPorTipo = t4.Result;
+            ticketPromedio = t5.Result;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error calculando reportes: " + ex.Message);
+        }
+
+        cargando = false;
+    }
+}

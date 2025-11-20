@@ -72,6 +72,18 @@
             background-color: #2e7d32;
         }
 
+    /* Estilo para el nuevo botón de reportes */
+    .btn-reportes {
+        background-color: #607d8b; /* Gris azulado profesional */
+        color: white;
+        border: 1px solid #455a64;
+        margin-left: 10px;
+    }
+
+        .btn-reportes:hover {
+            background-color: #455a64;
+        }
+
     .btn-accion {
         border: none;
         padding: 6px 12px;
@@ -85,7 +97,7 @@
     .btn-editar {
         background-color: #2196f3;
     }
-   
+
     .btn-eliminar {
         background-color: var(--taxi-rojo);
     }
@@ -121,6 +133,10 @@ else
     <div style="text-align: center; margin-bottom: 20px;">
         <button @onclick='() => Navegacion.NavigateTo("/Facturas")' class="btn-simple btn-navegacion" style="padding: 10px 20px;">
             + Nueva Factura
+        </button>
+
+        <button @onclick='() => Navegacion.NavigateTo("/Reportes")' class="btn-simple btn-reportes" style="padding: 10px 20px;">
+            📊 Ver Reportes y Estadísticas
         </button>
     </div>
 
@@ -206,7 +222,7 @@ else
 
     private async Task EliminarFactura(FacturaModel f)
     {
-        bool confirmado = true; 
+        bool confirmado = true;
         if (confirmado)
         {
             await ServicioFacturas.EliminarFactura(f);
