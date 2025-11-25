@@ -35,21 +35,20 @@ using (var cx = new SqliteConnection($"Data Source={rutaDb}"))
 
     var cmd = cx.CreateCommand();
     cmd.CommandText = @"
+        /* CAMBIO PRINCIPAL: Agregamos 'archivada INTEGER DEFAULT 0' */
         CREATE TABLE IF NOT EXISTS facturas(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             fecha TEXT,
-            cliente TEXT
+            cliente TEXT,
+            archivada INTEGER DEFAULT 0 
         );
 
-        /* Eliminamos la tabla anterior para recrearla con el nuevo campo */
         DROP TABLE IF EXISTS articulos; 
-        /* Nota: Si ya existe 'viajes' sin la columna tipo, esto no la altera automáticamente.
-           Por eso recomendamos borrar el archivo .db al reiniciar */
         
         CREATE TABLE IF NOT EXISTS viajes(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             facturaId INTEGER,
-            tipo TEXT,  /* Nuevo Campo */
+            tipo TEXT,
             descripcion TEXT,
             folio TEXT,
             monto REAL DEFAULT 0

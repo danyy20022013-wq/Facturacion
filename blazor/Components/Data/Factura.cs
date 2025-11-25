@@ -9,6 +9,7 @@ namespace facturas.Components.Data
         public DateTime Fecha { get; set; } = DateTime.Now;
         public string Cliente { get; set; } = "";
 
+        public bool Archivada { get; set; } = false;
 
         public List<Viaje> Viajes { get; set; } = new();
 
