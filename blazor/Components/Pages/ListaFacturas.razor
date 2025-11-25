@@ -1,184 +1,167 @@
 ﻿@page "/ListaFacturas"
 @using facturas.Components.Data
 @using FacturaModel = facturas.Components.Data.Facturas
-@using Microsoft.AspNetCore.Components
+@inject NavigationManager Navegacion
+@inject ServicioFacturas ServicioFacturas
 @rendermode InteractiveServer
 
 <style>
-    :root {
-        --taxi-verde: #3da53d;
-        --taxi-amarillo: #fdd835;
-        --taxi-rojo: #d32f2f;
-        --taxi-texto-oscuro: #333;
-        --taxi-gris-claro: #f7f7f7;
+    
+    .ios-header-action {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
     }
 
-    .seccion-baja {
-        border: 1px solid #ddd;
-        border-top: 5px solid var(--taxi-verde);
-        padding: 20px;
-        margin-bottom: 20px;
-        background-color: #ffffff;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        border-radius: 5px;
+    h1 {
+        font-size: 34px;
+        font-weight: 700;
+        margin: 0;
+        letter-spacing: -0.5px;
     }
 
-    .tabla-registro {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 10px;
-    }
-
-        .tabla-registro th, .tabla-registro td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-            font-size: 0.9em;
-        }
-
-        .tabla-registro th {
-            background-color: var(--taxi-verde);
-            color: white;
-            font-weight: bold;
-        }
-
-    .pie-tabla {
-        font-weight: bold;
-        text-align: right;
-        padding: 5px 0;
-        border-top: 2px solid var(--taxi-verde);
-        margin-top: 5px;
-        font-size: 1.1em;
-    }
-
-    .btn-simple {
-        background-color: var(--taxi-amarillo);
-        color: var(--taxi-texto-oscuro);
-        border: 1px solid #fbc02d;
-        padding: 8px 12px;
-        cursor: pointer;
-        font-size: 0.9em;
-        border-radius: 4px;
-        font-weight: bold;
-    }
-
-    .btn-navegacion {
-        background-color: var(--taxi-verde);
+    .ios-btn-primary {
+        background-color: var(--ios-tint);
         color: white;
-        border: 1px solid #2e7d32;
-    }
-
-        .btn-navegacion:hover {
-            background-color: #2e7d32;
-        }
-
-    /* Estilo para el nuevo botón de reportes */
-    .btn-reportes {
-        background-color: #607d8b; /* Gris azulado profesional */
-        color: white;
-        border: 1px solid #455a64;
-        margin-left: 10px;
-    }
-
-        .btn-reportes:hover {
-            background-color: #455a64;
-        }
-
-    .btn-accion {
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-weight: 600;
         border: none;
-        padding: 6px 12px;
-        border-radius: 4px;
         cursor: pointer;
-        color: white;
-        font-weight: bold;
-        margin-right: 5px;
+        font-size: 15px;
+        transition: transform 0.1s;
     }
 
-    .btn-editar {
-        background-color: #2196f3;
+        .ios-btn-primary:active {
+            transform: scale(0.96);
+            opacity: 0.8;
+        }
+
+    
+    .ios-search-bar {
+        background-color: #E3E3E8;
+        border-radius: 10px;
+        padding: 8px 12px;
+        border: none;
+        width: 100%;
+        font-size: 17px;
+        margin-bottom: 20px;
+        box-sizing: border-box; 
     }
 
-    .btn-eliminar {
-        background-color: var(--taxi-rojo);
+        .ios-search-bar:focus {
+            outline: none;
+            background-color: #D1D1D6;
+        }
+
+    .ios-list-group {
+        background-color: var(--ios-bg-card);
+        border-radius: var(--ios-radius);
+        overflow: hidden; 
     }
 
-    .enlace-detalle {
-        color: var(--taxi-verde);
-        text-decoration: underline;
+    
+    .ios-list-item {
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 0.5px solid var(--ios-separator); 
         cursor: pointer;
-        font-weight: bold;
+        background-color: white;
+        transition: background-color 0.2s;
     }
 
-    .campo-texto {
-        padding: 8px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
+        .ios-list-item:last-child {
+            border-bottom: none;
+        }
+
+        .ios-list-item:hover {
+            background-color: #F2F2F7;
+        }
+
+    .item-main {
+        display: flex;
+        flex-direction: column;
     }
+
+    .item-title {
+        font-weight: 600;
+        font-size: 17px;
+        color: var(--ios-black-text);
+    }
+
+    .item-subtitle {
+        font-size: 14px;
+        color: var(--ios-gray-text);
+        margin-top: 2px;
+    }
+
+    .item-trailing {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--ios-gray-text);
+        font-size: 17px;
+    }
+
+    .price-tag {
+        color: var(--ios-black-text);
+        font-weight: 500;
+    }
+
+    .chevron {
+        font-size: 14px;
+        color: #C7C7CC;
+    }
+  
 </style>
 
-<h1>Historial de Facturas</h1>
-
-<div class="seccion-baja" style="display: flex; gap: 10px; align-items: center;">
-    <label>Filtrar por Cliente:</label>
-    <input type="text" @bind-value="filtroCliente" @oninput="FiltrarFacturas" class="campo-texto" style="width: 300px;" />
-    <button @onclick="LimpiarFiltro" class="btn-simple">Limpiar</button>
+<div class="ios-header-action">
+    <h1>Facturas</h1>
+    <button @onclick='() => Navegacion.NavigateTo("/Facturas")' class="ios-btn-primary">
+        + Nueva
+    </button>
 </div>
 
-@if (facturas == null)
+<input type="text"
+       @bind-value="filtroCliente"
+       @oninput="FiltrarFacturas"
+       placeholder="Buscar por cliente"
+       class="ios-search-bar" />
+
+@if (facturasFiltradas == null)
 {
-    <p>Cargando registros...</p>
+    <p style="text-align:center; color: var(--ios-gray-text);">Cargando...</p>
+}
+else if (facturasFiltradas.Count == 0)
+{
+    <p style="text-align:center; color: var(--ios-gray-text); margin-top: 50px;">No hay facturas registradas.</p>
 }
 else
 {
-    <div style="text-align: center; margin-bottom: 20px;">
-        <button @onclick='() => Navegacion.NavigateTo("/Facturas")' class="btn-simple btn-navegacion" style="padding: 10px 20px;">
-            + Nueva Factura
-        </button>
-
-        <button @onclick='() => Navegacion.NavigateTo("/Reportes")' class="btn-simple btn-reportes" style="padding: 10px 20px;">
-            📊 Ver Reportes y Estadísticas
-        </button>
-    </div>
-
-    @if (facturasFiltradas.Count == 0)
-    {
-        <p>No hay facturas registradas.</p>
-    }
-    else
-    {
+    <div class="ios-list-group">
         @foreach (var f in facturasFiltradas)
         {
-            <div class="seccion-baja" style="background-color: #fdfdfd;">
-                <div style="border-bottom: 1px dashed #ccc; padding-bottom: 10px; margin-bottom: 10px;">
-                    <h4 style="margin: 0;">
-                        <a @onclick='() => Navegacion.NavigateTo($"/DetalleFactura/{f.Id}")' class="enlace-detalle">
-                            Factura #@f.Id
-                        </a>
-                        <span style="float:right; font-size:0.8em; font-weight:normal; color:#666;">@f.Fecha.ToShortDateString()</span>
-                    </h4>
-                    <p style="margin: 5px 0 0 0;">Cliente: <strong>@f.Cliente</strong></p>
+            <div class="ios-list-item" @onclick='() => Navegacion.NavigateTo($"/DetalleFactura/{f.Id}")'>
+                <div class="item-main">
+                    <span class="item-title">@f.Cliente</span>
+                    <span class="item-subtitle">@f.Fecha.ToShortDateString()</span>
                 </div>
-
-                <div class="pie-tabla" style="margin-top: 0; border-top-color: #eee;">
-                    TOTAL: $@f.Total.ToString("C2")
-                </div>
-
-                <div style="margin-top: 15px;">
-                    <button @onclick='() => Navegacion.NavigateTo($"/Factura/{f.Id}")' class="btn-accion btn-editar">Editar</button>
-                    <button @onclick="() => EliminarFactura(f)" class="btn-accion btn-eliminar">Eliminar</button>
+                <div class="item-trailing">
+                    <span class="price-tag">@f.Total.ToString("C2")</span>
+                    <span class="chevron">❯</span>
                 </div>
             </div>
         }
-    }
+    </div>
 }
 
 @code {
     private List<FacturaModel> facturas;
     private List<FacturaModel> facturasFiltradas;
     private string filtroCliente = string.Empty;
-
-    [Inject] public NavigationManager Navegacion { get; set; }
-    [Inject] public ServicioFacturas ServicioFacturas { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -187,16 +170,8 @@ else
 
     private async Task CargarDatos()
     {
-        try
-        {
-            facturas = await ServicioFacturas.ObtenerFacturas();
-            AplicarFiltro();
-        }
-        catch
-        {
-            facturas = new List<FacturaModel>();
-            facturasFiltradas = new List<FacturaModel>();
-        }
+        facturas = await ServicioFacturas.ObtenerFacturas();
+        AplicarFiltro();
     }
 
     private void FiltrarFacturas(ChangeEventArgs e)
@@ -207,26 +182,7 @@ else
 
     private void AplicarFiltro()
     {
-        if (string.IsNullOrWhiteSpace(filtroCliente))
-            facturasFiltradas = facturas;
-        else
-            facturasFiltradas = facturas.Where(f => f.Cliente.Contains(filtroCliente, StringComparison.OrdinalIgnoreCase)).ToList();
-        StateHasChanged();
-    }
-
-    private void LimpiarFiltro()
-    {
-        filtroCliente = string.Empty;
-        AplicarFiltro();
-    }
-
-    private async Task EliminarFactura(FacturaModel f)
-    {
-        bool confirmado = true;
-        if (confirmado)
-        {
-            await ServicioFacturas.EliminarFactura(f);
-            await CargarDatos();
-        }
+        if (string.IsNullOrWhiteSpace(filtroCliente)) facturasFiltradas = facturas;
+        else facturasFiltradas = facturas.Where(f => f.Cliente.Contains(filtroCliente, StringComparison.OrdinalIgnoreCase)).ToList();
     }
 }

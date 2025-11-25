@@ -1,84 +1,108 @@
 ﻿@inherits LayoutComponentBase
 
 <style>
-    
+  
+    :root {
+   
+        --ios-bg-app: #F2F2F7; 
+        --ios-bg-card: #FFFFFF; 
+        --ios-separator: #C6C6C8; 
+        
+        --ios-tint: #34C759; 
+        --ios-tint-dark: #248A3D; 
+        
+        --ios-blue: #007AFF; 
+        --ios-red: #FF3B30; 
+        --ios-yellow: #FFCC00;
+        --ios-gray-text: #8E8E93; 
+        --ios-black-text: #000000; 
+  
+        --ios-radius: 12px; 
+        --ios-shadow: 0 2px 8px rgba(0, 0, 0, 0.04); 
+        --ios-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+   
     body {
         margin: 0;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background-color: #f4f4f4;
+        font-family: var(--ios-font);
+        background-color: var(--ios-bg-app);
+        color: var(--ios-black-text);
+        -webkit-font-smoothing: antialiased; 
     }
 
-    .top-bar {
-       
-        background: linear-gradient(90deg, #3da53d 0%, #2e7d32 100%); 
-        color: white;
-        height: 70px; 
-        padding: 0 30px; 
-        
-      
-        display: flex; 
-        justify-content: space-between; 
-        align-items: center; 
-        
-        box-shadow: 0 4px 10px rgba(0,0,0,0.15); 
+    a {
+        text-decoration: none;
+    }
+
+    
+    .ios-navbar {
+        background-color: rgba(255, 255, 255, 0.85); 
+        backdrop-filter: saturate(180%) blur(20px); 
+        -webkit-backdrop-filter: saturate(180%) blur(20px);
+        border-bottom: 1px solid rgba(0,0,0,0.1);
+        height: 50px; 
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 20px;
         position: sticky;
         top: 0;
-        z-index: 100; 
+        z-index: 1000;
     }
 
-    .brand-logo {
-        font-size: 1.5em;
-        font-weight: bold;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
-    }
-
-    .nav-menu {
-        display: flex;
-        gap: 15px;
-    }
-
-    .nav-link-custom {
-        color: white;
-        text-decoration: none;
+    .ios-title {
         font-weight: 600;
-        font-size: 1rem;
-        padding: 8px 16px;
-        border-radius: 25px; 
-        transition: all 0.3s ease;
+        font-size: 17px; 
+        color: var(--ios-black-text);
+    }
+
+    .ios-nav-links {
         display: flex;
-        align-items: center;
-        gap: 8px;
-        border: 1px solid transparent;
+        gap: 20px;
     }
 
-    .nav-link-custom:hover {
-        background-color: rgba(255, 255, 255, 0.2);
-        border-color: rgba(255, 255, 255, 0.4);
-        transform: translateY(-2px);
+    .ios-link {
+        color: var(--ios-blue);
+        font-size: 17px;
+        cursor: pointer;
+        transition: opacity 0.2s;
     }
 
+        .ios-link:hover {
+            opacity: 0.6;
+        }
+
+        .ios-link.active {
+            font-weight: 600;
+        }
+
+   
     .main-content {
-        padding: 30px;
-        max-width: 1200px; 
+        padding: 20px;
+        max-width: 800px; 
         margin: 0 auto;
+        animation: fadeIn 0.3s ease-in-out;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 </style>
 
-<div class="top-bar">
-    <div class="brand-logo">
-        <span>🚖</span> <span>Taxi LM</span>
-    </div>
-
-    <div class="nav-menu">
-        <a href="/ListaFacturas" class="nav-link-custom">
-            📄 Facturas
-        </a>
-        <a href="/Reportes" class="nav-link-custom">
-            📊 Estadísticas
-        </a>
+<div class="ios-navbar">
+    <div class="ios-title">Taxi LM</div>
+    <div class="ios-nav-links">
+        <a href="/ListaFacturas" class="ios-link">Facturas</a>
+        <a href="/Reportes" class="ios-link">Reportes</a>
     </div>
 </div>
 

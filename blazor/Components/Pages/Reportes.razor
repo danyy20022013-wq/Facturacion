@@ -4,139 +4,108 @@
 @rendermode InteractiveServer
 
 <style>
-    :root {
-        --taxi-verde: #3da53d;
-        --taxi-amarillo: #fdd835;
-        --taxi-gris-claro: #f7f7f7;
+    h1 {
+        font-size: 34px;
+        font-weight: 700;
+        margin-bottom: 20px;
     }
 
-    .contenedor-reportes {
+    .ios-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
         gap: 20px;
+    }
+
+    .ios-widget {
+        background-color: var(--ios-bg-card);
+        border-radius: 20px; 
         padding: 20px;
+        box-shadow: var(--ios-shadow);
+        display: flex;
+        flex-direction: column;
     }
 
-    .tarjeta-reporte {
-        background: white;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        padding: 15px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        border-top: 4px solid var(--taxi-verde);
+    .widget-title {
+        font-size: 15px;
+        font-weight: 600;
+        text-transform: uppercase;
+        color: var(--ios-gray-text);
+        margin-bottom: 10px;
     }
 
-    .titulo-reporte {
-        font-size: 1.1em;
-        font-weight: bold;
-        margin-bottom: 15px;
-        color: #333;
-        border-bottom: 1px solid #eee;
-        padding-bottom: 5px;
+    .widget-value-big {
+        font-size: 36px;
+        font-weight: 700;
+        color: var(--ios-black-text);
     }
 
-    .tabla-datos {
-        width: 100%;
-        border-collapse: collapse;
+    .widget-list-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 0.5px solid var(--ios-separator);
+        font-size: 15px;
     }
 
-        .tabla-datos td {
-            padding: 6px;
-            border-bottom: 1px solid #f0f0f0;
+        .widget-list-item:last-child {
+            border-bottom: none;
         }
 
-    .valor-destacado {
-        font-weight: bold;
-        color: var(--taxi-verde);
-        text-align: right;
-    }
-
-    .big-number {
-        font-size: 2.5em;
-        font-weight: bold;
-        color: var(--taxi-verde);
-        text-align: center;
-        margin: 20px 0;
-    }
-
-    .subtitulo {
-        text-align: center;
-        color: #666;
+    .text-green {
+        color: var(--ios-tint);
+        font-weight: 600;
     }
 </style>
 
-<h1>Tablero de Inteligencia - Taxi LM</h1>
+<h1>Estadísticas</h1>
 
 @if (cargando)
 {
-    <p>Calculando estadísticas...</p>
+    <p>Cargando...</p>
 }
 else
 {
-    <div class="contenedor-reportes">
+    <div class="ios-grid">
 
-        <div class="tarjeta-reporte">
-            <div class="titulo-reporte">💰 Ingresos por Tipo de Viaje</div>
-            <table class="tabla-datos">
-                @foreach (var d in ingresosPorTipo)
-                {
-                    <tr>
-                        <td>@d.Etiqueta</td>
-                        <td class="valor-destacado">@d.Valor.ToString("C2")</td>
-                    </tr>
-                }
-            </table>
+        <div class="ios-widget">
+            <span class="widget-title">Ticket Promedio</span>
+            <span class="widget-value-big">@ticketPromedio.ToString("C2")</span>
+            <span style="font-size:13px; color:#8E8E93;">Por factura emitida</span>
         </div>
 
-        <div class="tarjeta-reporte">
-            <div class="titulo-reporte">🏆 Top 5 Clientes VIP</div>
-            <table class="tabla-datos">
-                @foreach (var d in mejoresClientes)
-                {
-                    <tr>
-                        <td>@d.Etiqueta</td>
-                        <td class="valor-destacado">@d.Valor.ToString("C2")</td>
-                    </tr>
-                }
-            </table>
+        <div class="ios-widget">
+            <span class="widget-title">Ingresos por Tipo</span>
+            @foreach (var d in ingresosPorTipo.Take(3))
+            {
+                <div class="widget-list-item">
+                    <span>@d.Etiqueta</span>
+                    <span class="text-green">@d.Valor.ToString("C2")</span>
+                </div>
+            }
         </div>
 
-        <div class="tarjeta-reporte">
-            <div class="titulo-reporte">📅 Historial de Ventas (Mes)</div>
-            <table class="tabla-datos">
-                @foreach (var d in ventasPorMes)
-                {
-                    <tr>
-                        <td>@d.Etiqueta</td>
-                        <td class="valor-destacado">@d.Valor.ToString("C2")</td>
-                    </tr>
-                }
-            </table>
+        <div class="ios-widget">
+            <span class="widget-title">Top Clientes</span>
+            @foreach (var d in mejoresClientes.Take(3))
+            {
+                <div class="widget-list-item">
+                    <span>@d.Etiqueta</span>
+                    <span>@d.Valor.ToString("C2")</span>
+                </div>
+            }
         </div>
 
-        <div class="tarjeta-reporte">
-            <div class="titulo-reporte">🚕 Viajes Realizados (Cantidad)</div>
-            <table class="tabla-datos">
-                @foreach (var d in volumenPorTipo)
-                {
-                    <tr>
-                        <td>@d.Etiqueta</td>
-                        <td class="valor-destacado">@d.Valor.ToString("N0")</td>
-                    </tr>
-                }
-            </table>
+        <div class="ios-widget">
+            <span class="widget-title">Viajes Totales</span>
+            @foreach (var d in volumenPorTipo.Take(3))
+            {
+                <div class="widget-list-item">
+                    <span>@d.Etiqueta</span>
+                    <span style="font-weight:bold;">@d.Valor.ToString("N0")</span>
+                </div>
+            }
         </div>
 
-        <div class="tarjeta-reporte" style="display:flex; flex-direction:column; justify-content:center;">
-            <div class="titulo-reporte">📊 Ticket Promedio</div>
-            <div class="big-number">@ticketPromedio.ToString("C2")</div>
-            <div class="subtitulo">Promedio por factura emitida</div>
-        </div>
-
-    </div>
-
-    <div style="text-align: center; margin-top: 30px;">
-        <a href="/ListaFacturas" style="background-color: #3da53d; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; font-weight: bold;">Volver al Listado</a>
     </div>
 }
 
@@ -152,26 +121,15 @@ else
     {
         try
         {
-           
             var t1 = ServicioFacturas.ObtenerIngresosPorTipo();
             var t2 = ServicioFacturas.ObtenerMejoresClientes();
             var t3 = ServicioFacturas.ObtenerVentasPorMes();
             var t4 = ServicioFacturas.ObtenerVolumenPorTipo();
             var t5 = ServicioFacturas.ObtenerTicketPromedio();
-
             await Task.WhenAll(t1, t2, t3, t4, t5);
-
-            ingresosPorTipo = t1.Result;
-            mejoresClientes = t2.Result;
-            ventasPorMes = t3.Result;
-            volumenPorTipo = t4.Result;
-            ticketPromedio = t5.Result;
+            ingresosPorTipo = t1.Result; mejoresClientes = t2.Result; ventasPorMes = t3.Result; volumenPorTipo = t4.Result; ticketPromedio = t5.Result;
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine("Error calculando reportes: " + ex.Message);
-        }
-
+        catch { }
         cargando = false;
     }
 }

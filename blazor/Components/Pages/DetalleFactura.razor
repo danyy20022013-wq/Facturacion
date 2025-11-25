@@ -1,125 +1,119 @@
 ﻿@page "/DetalleFactura/{FacturaId:int}"
 @using facturas.Components.Data
 @using FacturaModel = facturas.Components.Data.Facturas
-@using ViajeModel = facturas.Components.Data.Viaje
-@using Microsoft.AspNetCore.Components
+@inject NavigationManager Navegacion
+@inject ServicioFacturas ServicioFacturas
 @rendermode InteractiveServer
 
 <style>
-    :root {
-        --taxi-verde: #3da53d;
-    }
-
-    .contenedor-detalle {
-        border: 1px solid #ddd;
-        border-top: 5px solid var(--taxi-verde);
-        padding: 25px;
-        background-color: #ffffff;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        border-radius: 5px;
-    }
-
-    .info-header {
-        border-bottom: 2px solid #eee;
-        margin-bottom: 15px;
-        padding-bottom: 10px;
-    }
-
-    .tabla-registro {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 10px;
-    }
-
-        .tabla-registro th, .tabla-registro td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-
-        .tabla-registro th {
-            background-color: var(--taxi-verde);
-            color: white;
-            font-weight: bold;
-        }
-
-    .pie-tabla-detalle {
-        font-weight: bold;
-        text-align: right;
-        padding: 10px 0;
-        font-size: 1.2em;
-        border-top: 2px solid var(--taxi-verde);
-        margin-top: 10px;
-    }
-
-    .btn-simple {
-        background-color: var(--taxi-verde);
-        color: white;
-        border: 1px solid #2e7d32;
-        padding: 10px 20px;
-        cursor: pointer;
+    .ios-detail-card {
+        background-color: var(--ios-bg-card);
+        border-radius: var(--ios-radius);
+        padding: 20px;
         margin-top: 20px;
-        border-radius: 4px;
-        font-weight: bold;
+        box-shadow: var(--ios-shadow);
+    }
+
+    .detail-header {
+        border-bottom: 0.5px solid var(--ios-separator);
+        padding-bottom: 15px;
+        margin-bottom: 15px;
+    }
+
+    .client-name {
+        font-size: 24px;
+        font-weight: 700;
+    }
+
+    .invoice-date {
+        color: var(--ios-gray-text);
+        font-size: 15px;
+    }
+
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 0.5px solid #F2F2F7;
+    }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+    .total-row {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+        font-size: 20px;
+        font-weight: 700;
+    }
+
+    .ios-btn-text {
+        color: var(--ios-blue);
+        background: none;
+        border: none;
+        font-size: 17px;
+        cursor: pointer;
+    }
+
+    .ios-btn-danger {
+        color: var(--ios-red);
+        background: none;
+        border: none;
+        font-size: 17px;
+        cursor: pointer;
     }
 </style>
 
-<h1>Detalle de Factura #@FacturaId</h1>
-
-@if (factura == null)
+@if (factura != null)
 {
-    <p>Cargando detalles...</p>
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+        <button class="ios-btn-text" @onclick='() => Navegacion.NavigateTo("/ListaFacturas")'>❮ Atrás</button>
+        <button class="ios-btn-text" @onclick='() => Navegacion.NavigateTo($"/Factura/{factura.Id}")'>Editar</button>
+    </div>
+
+    <div class="ios-detail-card">
+        <div class="detail-header">
+            <div class="client-name">@factura.Cliente</div>
+            <div class="invoice-date">@factura.Fecha.ToLongDateString()</div>
+        </div>
+
+        @foreach (var v in factura.Viajes)
+        {
+            <div class="detail-row">
+                <div style="display:flex; flex-direction:column;">
+                    <span style="font-weight:500;">@v.Descripcion</span>
+                    <span style="font-size:13px; color:#8E8E93;">@v.Tipo • @v.Folio</span>
+                </div>
+                <span>@v.Monto.ToString("C2")</span>
+            </div>
+        }
+
+        <div class="total-row">
+            <span>Total</span>
+            <span>@factura.Total.ToString("C2")</span>
+        </div>
+    </div>
+
+    <div style="text-align:center; margin-top: 30px;">
+        <button class="ios-btn-danger" @onclick="Eliminar">Eliminar Factura</button>
+    </div>
 }
 else
 {
-    <div class="contenedor-detalle">
-        <div class="info-header">
-            <p><strong>Cliente:</strong> @factura.Cliente</p>
-            <p><strong>Fecha:</strong> @factura.Fecha.ToShortDateString()</p>
-        </div>
 
-        <h3>Viajes Facturados</h3>
-
-        <table class="tabla-registro">
-            <thead>
-                <tr>
-                    <th style="width: 15%;">Tipo</th>
-                    <th style="width: 35%;">Descripción</th>
-                    <th style="width: 25%;">Folio</th>
-                    <th style="width: 25%;">Monto</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var v in factura.Viajes)
-                {
-                    <tr>
-                        <td style="font-weight:bold; color:#555;">@v.Tipo</td>
-                        <td>@v.Descripcion</td>
-                        <td>@v.Folio</td>
-                        <td>@v.Monto.ToString("C2")</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-
-        <div class="pie-tabla-detalle">
-            TOTAL: $@factura.Total.ToString("C2")
-        </div>
-
-        <button @onclick='() => Navegacion.NavigateTo("/ListaFacturas")' class="btn-simple">
-            Volver
-        </button>
-    </div>
+    <p>Cargando...</p>
 }
 
 @code {
     [Parameter] public int FacturaId { get; set; }
     private FacturaModel factura;
-    [Inject] public NavigationManager Navegacion { get; set; }
-    [Inject] public ServicioFacturas ServicioFacturas { get; set; }
+    protected override async Task OnInitializedAsync() => factura = await ServicioFacturas.ObtenerFacturaPorId(FacturaId);
 
-    protected override async Task OnInitializedAsync()
+    private async Task Eliminar()
     {
-        factura = await ServicioFacturas.ObtenerFacturaPorId(FacturaId);
+        await ServicioFacturas.EliminarFactura(factura);
+        Navegacion.NavigateTo("/ListaFacturas");
     }
 }
