@@ -6,7 +6,6 @@
 @rendermode InteractiveServer
 
 <style>
-    
     .ios-header-action {
         display: flex;
         justify-content: space-between;
@@ -30,15 +29,8 @@
         border: none;
         cursor: pointer;
         font-size: 15px;
-        transition: transform 0.1s;
     }
 
-        .ios-btn-primary:active {
-            transform: scale(0.96);
-            opacity: 0.8;
-        }
-
-    
     .ios-search-bar {
         background-color: #E3E3E8;
         border-radius: 10px;
@@ -47,7 +39,7 @@
         width: 100%;
         font-size: 17px;
         margin-bottom: 20px;
-        box-sizing: border-box; 
+        box-sizing: border-box;
     }
 
         .ios-search-bar:focus {
@@ -58,24 +50,20 @@
     .ios-list-group {
         background-color: var(--ios-bg-card);
         border-radius: var(--ios-radius);
-        overflow: hidden; 
+        overflow: hidden;
+        box-shadow: var(--ios-shadow);
     }
 
-    
     .ios-list-item {
         padding: 15px 20px;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        border-bottom: 0.5px solid var(--ios-separator); 
+        border-bottom: 0.5px solid var(--ios-separator);
         cursor: pointer;
         background-color: white;
         transition: background-color 0.2s;
     }
-
-        .ios-list-item:last-child {
-            border-bottom: none;
-        }
 
         .ios-list-item:hover {
             background-color: #F2F2F7;
@@ -102,7 +90,6 @@
         display: flex;
         align-items: center;
         gap: 10px;
-        color: var(--ios-gray-text);
         font-size: 17px;
     }
 
@@ -111,57 +98,132 @@
         font-weight: 500;
     }
 
-    .chevron {
-        font-size: 14px;
-        color: #C7C7CC;
+    
+    .btn-icon {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 18px;
+        padding: 5px;
+        border-radius: 50%;
+        transition: background 0.2s;
     }
-  
+
+        .btn-icon:hover {
+            background-color: rgba(0,0,0,0.05);
+        }
+
+    .btn-archivar {
+        color: #FF9500;
+    }
+
+    .btn-desarchivar {
+        color: var(--ios-tint);
+    }
+
+    .modo-secreto-bar {
+        background-color: #333;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        animation: fadeIn 0.3s;
+    }
+
+    .input-secreto {
+        background: #555;
+        border: none;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 5px;
+        outline: none;
+    }
 </style>
 
 <div class="ios-header-action">
-    <h1>Facturas</h1>
+    <div style="display:flex; align-items:center; gap:10px;">
+        <h1>@(modoArchivado ? "🗄️ Archivo Secreto" : "Facturas")</h1>
+
+        <button class="btn-icon" style="font-size:22px;" @onclick="ToggleModoSecreto">
+            @(modoArchivado ? "🔓" : "🔒")
+        </button>
+    </div>
+
     <button @onclick='() => Navegacion.NavigateTo("/Facturas")' class="ios-btn-primary">
         + Nueva
     </button>
 </div>
 
-<input type="text"
-       @bind-value="filtroCliente"
-       @oninput="FiltrarFacturas"
-       placeholder="Buscar por cliente"
-       class="ios-search-bar" />
-
-@if (facturasFiltradas == null)
+@if (pidiendoPassword)
 {
-    <p style="text-align:center; color: var(--ios-gray-text);">Cargando...</p>
-}
-else if (facturasFiltradas.Count == 0)
-{
-    <p style="text-align:center; color: var(--ios-gray-text); margin-top: 50px;">No hay facturas registradas.</p>
-}
-else
-{
-    <div class="ios-list-group">
-        @foreach (var f in facturasFiltradas)
-        {
-            <div class="ios-list-item" @onclick='() => Navegacion.NavigateTo($"/DetalleFactura/{f.Id}")'>
-                <div class="item-main">
-                    <span class="item-title">@f.Cliente</span>
-                    <span class="item-subtitle">@f.Fecha.ToShortDateString()</span>
-                </div>
-                <div class="item-trailing">
-                    <span class="price-tag">@f.Total.ToString("C2")</span>
-                    <span class="chevron">❯</span>
-                </div>
-            </div>
-        }
+    <div class="modo-secreto-bar">
+        <span>🔑 Ingrese contraseña:</span>
+        <input type="password" @bind="passwordInput" class="input-secreto" @onkeyup="VerificarPassword" placeholder="****" />
+        <button class="ios-btn-primary" style="padding: 4px 10px; font-size:13px;" @onclick="VerificarPasswordBtn">Entrar</button>
+        <span style="color: #ff6b6b; margin-left:10px; font-size:13px;">@errorMsg</span>
     </div>
+}
+
+@if (!pidiendoPassword)
+{
+    <input type="text" @bind-value="filtroCliente" @oninput="FiltrarFacturas" placeholder="Buscar por cliente" class="ios-search-bar" />
+
+    @if (facturasFiltradas == null)
+    {
+        <p style="text-align:center; color: var(--ios-gray-text);">Cargando...</p>
+    }
+    else if (facturasFiltradas.Count == 0)
+    {
+        <p style="text-align:center; color: var(--ios-gray-text); margin-top: 50px;">
+            @(modoArchivado ? "No hay facturas archivadas." : "No hay facturas registradas.")
+        </p>
+    }
+    else
+    {
+        <div class="ios-list-group">
+            @foreach (var f in facturasFiltradas)
+            {
+                <div class="ios-list-item">
+                    <div class="item-main" style="flex:1;" @onclick='() => Navegacion.NavigateTo($"/DetalleFactura/{f.Id}")'>
+                        <span class="item-title">@f.Cliente</span>
+                        <span class="item-subtitle">@f.Fecha.ToShortDateString()</span>
+                    </div>
+
+                    <div class="item-trailing">
+                        <span class="price-tag" style="margin-right:15px;">@f.Total.ToString("C2")</span>
+
+                        @if (modoArchivado)
+                        {
+                            <button class="btn-icon btn-desarchivar" title="Desarchivar" @onclick="() => AlternarArchivo(f)">
+                                📤
+                            </button>
+                        }
+                        else
+                        {
+                            <button class="btn-icon btn-archivar" title="Archivar" @onclick="() => AlternarArchivo(f)">
+                                📥
+                            </button>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    }
 }
 
 @code {
     private List<FacturaModel> facturas;
     private List<FacturaModel> facturasFiltradas;
     private string filtroCliente = string.Empty;
+
+    private bool modoArchivado = false;
+    private bool pidiendoPassword = false;
+    private string passwordInput = "";
+    private string errorMsg = "";
+    private const string PASSWORD_SECRETO = "taxi2024";
 
     protected override async Task OnInitializedAsync()
     {
@@ -170,8 +232,51 @@ else
 
     private async Task CargarDatos()
     {
-        facturas = await ServicioFacturas.ObtenerFacturas();
+        if (modoArchivado)
+            facturas = await ServicioFacturas.ObtenerFacturasArchivadas();
+        else
+            facturas = await ServicioFacturas.ObtenerFacturas();
+
         AplicarFiltro();
+    }
+
+    private void ToggleModoSecreto()
+    {
+        if (modoArchivado)
+        {
+            modoArchivado = false;
+            pidiendoPassword = false;
+            passwordInput = "";
+            CargarDatos();
+        }
+        else
+        {
+            pidiendoPassword = !pidiendoPassword;
+            errorMsg = "";
+            passwordInput = "";
+        }
+    }
+
+    private void VerificarPassword(KeyboardEventArgs e) { if (e.Key == "Enter") VerificarPasswordBtn(); }
+
+    private void VerificarPasswordBtn()
+    {
+        if (passwordInput == PASSWORD_SECRETO)
+        {
+            modoArchivado = true;
+            pidiendoPassword = false;
+            CargarDatos();
+        }
+        else
+        {
+            errorMsg = "Contraseña incorrecta";
+        }
+    }
+
+    private async Task AlternarArchivo(FacturaModel f)
+    {
+        await ServicioFacturas.AlternarArchivo(f.Id, !modoArchivado);
+        await CargarDatos();
     }
 
     private void FiltrarFacturas(ChangeEventArgs e)
